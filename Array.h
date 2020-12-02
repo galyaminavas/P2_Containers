@@ -28,10 +28,11 @@ class Array final {
 
     T* arrayStart;
     int elements = 0;
-    int currCapacity;
     const int initCapacity = 16;
 
 public:
+    int currCapacity;
+
     Array() {
         arrayStart = new T[initCapacity];
         currCapacity = initCapacity;
@@ -118,10 +119,10 @@ public:
             arrayStart = newArrayStart;
 //            std::swap(newArrayStart, arrayStart);
         } else {
-            for (int i = elements; i > index - 1; i--) {
+            for (int i = elements; i > index; i--) {
                 arrayStart[i] = std::move(arrayStart[i - 1]);
             }
-            arrayStart[index - 1] = value;
+            arrayStart[index] = value;
             elements++;
         }
 
