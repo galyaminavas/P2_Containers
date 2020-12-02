@@ -71,7 +71,8 @@ public:
     int currCapacity;
 
     Array() {
-        data_ = new T[initCapacity_];
+        data_ = (T *)malloc(initCapacity_ * sizeof(T));
+//        data_ = new T[initCapacity_];
         currCapacity = initCapacity_;
 
         //Debug output
@@ -80,7 +81,8 @@ public:
     }
 
     Array(int capacity) {
-        data_ = new T[capacity];
+        data_ = (T *)malloc(capacity * sizeof(T));
+//        data_ = new T[capacity];
         currCapacity = capacity;
 
         //Debug output
@@ -94,7 +96,8 @@ public:
         for (int i = 0; i < elementsCount_; i++) {
             data_[i].~T();
         }
-        delete [] data_;
+        free(data_);
+//        delete [] data_;
 
         //Debug output
         std::cout << "~Array\n";
@@ -108,18 +111,23 @@ public:
     void insert(const T& value) {
         if (currCapacity <= elementsCount_) {
             currCapacity *= 2;
-            T* newArrayStart = new T[currCapacity];
+            T* newArrayStart = (T *)malloc(currCapacity * sizeof(T));
+//            T* newArrayStart = new T[currCapacity];
             for (int i = 0; i < elementsCount_; i++) {
                 newArrayStart[i] = std::move(data_[i]);
             }
 //            newArrayStart = std::move(data_); // will not change the address - incorrect!
+            //Debug output
             for (int i = 0; i < elementsCount_; i++) {
                 std::cout << &data_[i] << " -> " << &newArrayStart[i] << std::endl;
             }
+            //\Debug output
 //            std::cout << data_[0] << std::endl;
 //            std::cout << newArrayStart[0] << std::endl;
 
-            delete [] data_;
+            free(data_);
+//            delete [] data_;
+
 //            std::cout << *data_ << std::endl;
 //            std::cout << newArrayStart[0] << std::endl;
             data_ = newArrayStart;
@@ -136,7 +144,8 @@ public:
     void insert(int index, const T& value) {
         if (currCapacity <= elementsCount_) {
             currCapacity *= 2;
-            T* newArrayStart = new T[currCapacity];
+            T* newArrayStart = (T *)malloc(currCapacity * sizeof(T));
+//            T* newArrayStart = new T[currCapacity];
             for (int i = 0; i < index; i++) {
                 newArrayStart[i] = std::move(data_[i]);
             }
@@ -152,7 +161,8 @@ public:
             }
             //\Debug output
 
-            delete [] data_;
+            free(data_);
+//            delete [] data_;
             data_ = newArrayStart;
 //            std::swap(newArrayStart, data_);
         } else {
