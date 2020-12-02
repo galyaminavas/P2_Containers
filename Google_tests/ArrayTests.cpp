@@ -160,5 +160,46 @@ TEST(testArray, size) {
 
 // Test iterator
 TEST(testArray, iterator) {
+    Array<int> a;
+    auto it = a.iterator();
+    for (int i = 0; i < 10; ++i)
+        a.insert(i + 1);
+    for (int i = 0; i < a.size(); ++i) {
+        // test get
+        ASSERT_EQ(it.get(), i + 1);
+        if (it.hasNext())
+            it.next();
+    }
 
+    // test if it is still on the last element
+    ASSERT_EQ(it.get(), 10);
+
+    // test set
+    it.set(20);
+    ASSERT_EQ(it.get(), 20);
+
+    // test insert
+    it.insert(10);
+    ASSERT_EQ(it.get(), 10);
+    ASSERT_TRUE(it.hasNext());
+    it.next();
+    ASSERT_EQ(it.get(), 20);
+
+    // test remove
+    ASSERT_FALSE(it.hasNext());
+    it.remove();
+    ASSERT_FALSE(it.hasNext());
+    ASSERT_EQ(it.get(), 10);
+
+    // test toIndex, next & hasNext, prev & hasPrev
+    ASSERT_FALSE(it.hasNext());
+    ASSERT_TRUE(it.hasPrev());
+    it.prev();
+    ASSERT_EQ(it.get(), 9);
+    it.toIndex(0);
+    ASSERT_EQ(it.get(), 1);
+    ASSERT_FALSE(it.hasPrev());
+    ASSERT_TRUE(it.hasNext());
+    it.next();
+    ASSERT_EQ(it.get(), 2);
 }
