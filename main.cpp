@@ -2,8 +2,8 @@
 
 #include "Array.h"
 
-int main() {
-//    Array<float> arrayFloat;
+void workingWithArray() {
+    //    Array<float> arrayFloat;
 //    arrayFloat.insert(5.6);
 //
 //    Array<int> arrayInt(3);
@@ -97,6 +97,13 @@ int main() {
         it.next();
     }
     std::cout << it.get() << std::endl;
+}
 
+void workingWithList() {
+
+}
+
+int main() {
+    workingWithArray();
     return 0;
 }
