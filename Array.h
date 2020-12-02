@@ -34,7 +34,14 @@ public:
         }
 
         void remove() {
-            array_.remove(currentIndex_);
+            // if we remove the last element
+            if (currentIndex_ == array_.size() - 1) {
+                currentElement_--;
+                array_.remove(currentIndex_);
+                currentIndex_--;
+            } else {
+                array_.remove(currentIndex_);
+            }
         }
 
         void next() {
