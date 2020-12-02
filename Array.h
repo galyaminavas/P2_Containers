@@ -6,36 +6,66 @@
 
 template<typename T>
 class Array final {
-    class Iterator {
-        const T& get() const;
-
-        void set(const T& value);
-
-        void insert(const T& value);
-
-        void remove();
-
-        void next();
-
-        void prev();
-
-        void toIndex(int index);
-
-        bool hasNext() const;
-
-        bool hasPrev() const;
-    };
-
-    T* arrayStart;
-    int elements = 0;
-    const int initCapacity = 16;
+    T* data_;
+    int elementsCount_ = 0;
+    const int initCapacity_ = 16;
 
 public:
+    class Iterator {
+    private:
+        Array<T>& array_;
+        int currentIndex_ = 0;
+        T* currentElement_ = &array_[0];
+
+    public:
+        Iterator(Array<T>& a): array_(a) {}
+
+        const T& get() const {
+            return *currentElement_;
+        }
+
+        void set(const T& value) {
+            *currentElement_ = value;
+//            array_[currentIndex_] = value; // this kinda works too
+        }
+
+        void insert(const T& value) {
+            array_.insert(currentIndex_, value);
+        }
+
+        void remove() {
+            array_.remove(currentIndex_);
+        }
+
+        void next() {
+            currentIndex_++;
+            currentElement_++;
+        }
+
+        void prev() {
+            currentIndex_--;
+            currentElement_--;
+        }
+
+        void toIndex(int index) {
+            currentIndex_= index;
+            currentElement_ = &array_[index];
+        }
+
+        bool hasNext() const {
+            return (currentIndex_ < array_.size() - 1);
+        }
+
+        bool hasPrev() const {
+            return (currentIndex_ > 0);
+        }
+    };
+
     int currCapacity;
 
     Array() {
-        arrayStart = new T[initCapacity];
-        currCapacity = initCapacity;
+        data_ = new T[initCapacity_];
+        currCapacity = initCapacity_;
 
         //Debug output
         std::cout << "Array() " << currCapacity << std::endl;
@@ -43,7 +73,7 @@ public:
     }
 
     Array(int capacity) {
-        arrayStart = new T[capacity];
+        data_ = new T[capacity];
         currCapacity = capacity;
 
         //Debug output
@@ -54,128 +84,128 @@ public:
     ~Array() {
         //При необходимости, при освобождении памяти
         //вызываются деструкторы хранимых элементов.
-        for (int i = 0; i < elements; i++) {
-            arrayStart[i].~T();
+        for (int i = 0; i < elementsCount_; i++) {
+            data_[i].~T();
         }
-        delete [] arrayStart;
+        delete [] data_;
 
         //Debug output
         std::cout << "~Array\n";
-//        for (int i = 0; i < elements; i++) {
-//            std::cout << arrayStart[i] << " ";
+//        for (int i = 0; i < elementsCount_; i++) {
+//            std::cout << data_[i] << " ";
 //        }
 //        std::cout << "\n";
         //\Debug output
     }
 
     void insert(const T& value) {
-        if (currCapacity <= elements) {
+        if (currCapacity <= elementsCount_) {
             currCapacity *= 2;
             T* newArrayStart = new T[currCapacity];
-            for (int i = 0; i < elements; i++) {
-                newArrayStart[i] = std::move(arrayStart[i]);
+            for (int i = 0; i < elementsCount_; i++) {
+                newArrayStart[i] = std::move(data_[i]);
             }
-//            newArrayStart = std::move(arrayStart); // will not change the address - incorrect!
-            for (int i = 0; i < elements; i++) {
-                std::cout << &arrayStart[i] << " -> " << &newArrayStart[i] << std::endl;
+//            newArrayStart = std::move(data_); // will not change the address - incorrect!
+            for (int i = 0; i < elementsCount_; i++) {
+                std::cout << &data_[i] << " -> " << &newArrayStart[i] << std::endl;
             }
-//            std::cout << arrayStart[0] << std::endl;
+//            std::cout << data_[0] << std::endl;
 //            std::cout << newArrayStart[0] << std::endl;
 
-            delete [] arrayStart;
-//            std::cout << *arrayStart << std::endl;
+            delete [] data_;
+//            std::cout << *data_ << std::endl;
 //            std::cout << newArrayStart[0] << std::endl;
-            arrayStart = newArrayStart;
+            data_ = newArrayStart;
         }
-        arrayStart[elements] = value;
-        elements++;
-        std::cout << "Capacity: " << currCapacity << ", Elements: " << elements << std::endl;
-        for (int i = 0; i < elements; i++) {
-            std::cout << arrayStart[i] << " ";
+        data_[elementsCount_] = value;
+        elementsCount_++;
+        std::cout << "Capacity: " << currCapacity << ", Elements: " << elementsCount_ << std::endl;
+        for (int i = 0; i < elementsCount_; i++) {
+            std::cout << data_[i] << " ";
         }
         std::cout << std::endl;
     }
 
     void insert(int index, const T& value) {
-        if (currCapacity <= elements) {
+        if (currCapacity <= elementsCount_) {
             currCapacity *= 2;
             T* newArrayStart = new T[currCapacity];
             for (int i = 0; i < index; i++) {
-                newArrayStart[i] = std::move(arrayStart[i]);
+                newArrayStart[i] = std::move(data_[i]);
             }
             newArrayStart[index] = value;
-            for (int i = index; i < elements; i++) {
-                newArrayStart[i + 1] = std::move(arrayStart[i]);
+            for (int i = index; i < elementsCount_; i++) {
+                newArrayStart[i + 1] = std::move(data_[i]);
             }
-            elements++;
+            elementsCount_++;
 
             //Debug output
-            for (int i = 0; i < elements; i++) {
-                std::cout << &arrayStart[i] << " -> " << &newArrayStart[i] << std::endl;
+            for (int i = 0; i < elementsCount_; i++) {
+                std::cout << &data_[i] << " -> " << &newArrayStart[i] << std::endl;
             }
             //\Debug output
 
-            delete [] arrayStart;
-            arrayStart = newArrayStart;
-//            std::swap(newArrayStart, arrayStart);
+            delete [] data_;
+            data_ = newArrayStart;
+//            std::swap(newArrayStart, data_);
         } else {
-            for (int i = elements; i > index; i--) {
-                arrayStart[i] = std::move(arrayStart[i - 1]);
+            for (int i = elementsCount_; i > index; i--) {
+                data_[i] = std::move(data_[i - 1]);
             }
-            arrayStart[index] = value;
-            elements++;
+            data_[index] = value;
+            elementsCount_++;
         }
 
         //Debug output
-        std::cout << "Capacity: " << currCapacity << ", Elements: " << elements << std::endl;
-        for (int i = 0; i < elements; i++) {
-            std::cout << arrayStart[i] << " ";
+        std::cout << "Capacity: " << currCapacity << ", Elements: " << elementsCount_ << std::endl;
+        for (int i = 0; i < elementsCount_; i++) {
+            std::cout << data_[i] << " ";
         }
         std::cout << std::endl;
         //\Debug output
     }
 
     void remove(int index) {
-        for (int i = index; i < elements - 1; i++) {
-            arrayStart[i] = std::move(arrayStart[i + 1]);
+        for (int i = index; i < elementsCount_ - 1; i++) {
+            data_[i] = std::move(data_[i + 1]);
         }
-        arrayStart[elements - 1].~T();
-        elements--;
+        data_[elementsCount_ - 1].~T();
+        elementsCount_--;
 
         //Debug output
-        std::cout << "Capacity: " << currCapacity << ", Elements: " << elements << std::endl;
-        for (int i = 0; i < elements; i++) {
-            std::cout << arrayStart[i] << " ";
+        std::cout << "Capacity: " << currCapacity << ", Elements: " << elementsCount_ << std::endl;
+        for (int i = 0; i < elementsCount_; i++) {
+            std::cout << data_[i] << " ";
         }
         std::cout << std::endl;
         //\Debug output
     }
 
     const T& operator[](int index) const {
-        return arrayStart[index];
+        return data_[index];
     }
 
     T& operator[](int index) {
-        return arrayStart[index];
+        return data_[index];
     }
 
     int size() const {
-        return elements;
+        return elementsCount_;
     }
 
     Iterator iterator() {
-
+        return Iterator(*this);
     }
 
     const Iterator iterator() const {
-
+        return Iterator(*this);
     }
 
     //запрет копирования и присваивания
     //copy
-    Array(const Array<T> &a) = delete;
+    Array(const Array &a) = delete;
     //assignment
-    Array<T> operator=(const Array<T> &a) = delete;
+    Array operator=(const Array &a) = delete;
 };
 
 #endif //P2_CONTAINERS_ARRAY_H
