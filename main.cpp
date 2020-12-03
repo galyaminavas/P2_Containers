@@ -111,10 +111,39 @@ void workingWithArray() {
 }
 
 void workingWithList() {
+    List<int> list;
+    for (int i = 0; i < 17; i++) {
+        list.insertTail(i + 1);
+
+    }
+//    list.removeTail();
+    list.stupidPrint();
+
+    auto it = list.iterator();
+    while (it.hasNext()) {
+        std::cout << it.get() << " ";
+        it.next();
+    }
+    std::cout << it.get() << "\n";
+
+    while (it.hasPrev()) {
+        std::cout << it.get() << " ";
+        it.prev();
+    }
+    std::cout << it.get() << "\n";
+
+    it.set(50);
+    std::cout << it.get() << "\n";
+    std::cout << it.hasPrev() << "\n";
+
+    std::cout << list.head() << " " << list.tail() << "\n";
+    std::cout << list.size() << "\n";
+
 
 }
 
 int main() {
-    workingWithArray();
+    workingWithList();
+//    std::cout << sizeof(int) << " " << sizeof(int*) << " " << sizeof(Chunk<int>) << " " << sizeof(Chunk<int>*);
     return 0;
 }
