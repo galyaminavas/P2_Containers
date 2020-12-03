@@ -1,6 +1,7 @@
 #include <iomanip>
 
 #include "Array.h"
+#include "List.h"
 
 void workingWithArray() {
     //    Array<float> arrayFloat;
@@ -62,9 +63,19 @@ void workingWithArray() {
     }
     it.set(1);
 
-//    // it won't not print the last element
+//    // for updated hasNext, otherwise, it won't print the last element
 //    for (auto it = a.iterator(); it.hasNext(); it.next())
 //        std::cout << it.get() << " ";
+//    std::cout << std::endl;
+
+//// for updated hasPrev, otherwise, it won't print the first element
+//    auto it = a.iterator();
+//    it.toIndex(a.size() - 1);
+//    while (it.hasPrev()) {
+//        std::cout << it.get() << " ";
+//        it.prev();
+//    }
+//    std::cout << std::endl;
 
     it.toIndex(0);
     while (it.hasNext()) {

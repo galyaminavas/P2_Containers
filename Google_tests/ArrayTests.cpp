@@ -173,6 +173,8 @@ TEST(testArray, iterator) {
 
     // test if it is still on the last element
     ASSERT_EQ(it.get(), 10);
+//    // test if it is on the end of the array for updated hasNext
+//    ASSERT_FALSE(it.hasNext());
 
     // test set
     it.set(20);

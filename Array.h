@@ -16,6 +16,8 @@ public:
         Array<T>& array_;
         int currentIndex_ = 0;
         T* currentElement_ = &array_[0];
+        // for hasNext & hasPrev
+//        T* arrayStart_ = &array_[0];
 
     public:
         Iterator(Array<T>& a): array_(a) {}
@@ -60,10 +62,14 @@ public:
         }
 
         bool hasNext() const {
+            // trying to update hasNext
+//            return (currentElement_ != (arrayStart_ + array_.size()));
             return (currentIndex_ < array_.size() - 1);
         }
 
         bool hasPrev() const {
+            // trying to update hasPrev
+//            return (currentElement_ != (arrayStart_ - 1));
             return (currentIndex_ > 0);
         }
     };
