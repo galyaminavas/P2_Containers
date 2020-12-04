@@ -1,4 +1,6 @@
 #include <iomanip>
+#include <iostream>
+#include <utility>
 
 #include "Array.h"
 #include "List.h"
@@ -165,13 +167,9 @@ void workingWithList() {
 //    std::cout << list.head() << " " << list.tail() << "\n";
 //    std::cout << list.size() << "\n";
 
-
-
-
 }
 
 int main() {
     workingWithList();
-//    std::cout << sizeof(int) << " " << sizeof(int*) << " " << sizeof(Chunk<int>) << " " << sizeof(Chunk<int>*);
     return 0;
 }

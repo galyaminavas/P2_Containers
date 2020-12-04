@@ -182,6 +182,9 @@ public:
                 for (int i = currentIndexInChunk_; i < currentChunk_->elements_; i++) {
                     currentChunk_->data_[i] = std::move(currentChunk_->data_[i + 1]);
                 }
+                if (currentIndexInChunk_ == currentChunk_->elements_ - 1) {
+                    currentIndexInChunk_--;
+                }
                 currentChunk_->removeTail();
                 list_.size_--;
             }
