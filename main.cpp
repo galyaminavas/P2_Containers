@@ -112,32 +112,60 @@ void workingWithArray() {
 
 void workingWithList() {
     List<int> list;
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < 15; i++) {
         list.insertTail(i + 1);
-
     }
-//    list.removeTail();
+
+    list.insertTail(100);
     list.stupidPrint();
 
     auto it = list.iterator();
-    while (it.hasNext()) {
-        std::cout << it.get() << " ";
-        it.next();
-    }
+//    for (int i = 0; i < 1; i++) {
+//        it.next();
+//    }
+//    it.next();
+    list.stupidPrint();
     std::cout << it.get() << "\n";
 
-    while (it.hasPrev()) {
-        std::cout << it.get() << " ";
-        it.prev();
-    }
-    std::cout << it.get() << "\n";
-
-    it.set(50);
-    std::cout << it.get() << "\n";
-    std::cout << it.hasPrev() << "\n";
-
-    std::cout << list.head() << " " << list.tail() << "\n";
+    it.remove();
+    std::cout << "NEW LIST AFTER REMOVING HEAD\n";
+    list.stupidPrint();
     std::cout << list.size() << "\n";
+//    std::cout << it.get() << "\n";
+//    list.stupidPrint();
+
+//    while (it.hasNext()) {
+//        std::cout << it.get() << " ";
+//        it.next();
+//    }
+
+//    list.removeTail();
+
+
+
+//    it.remove();
+//    list.stupidPrint();
+
+//    while (it.hasNext()) {
+//        std::cout << it.get() << " ";
+//        it.next();
+//    }
+//    std::cout << it.get() << "\n";
+//
+//    while (it.hasPrev()) {
+//        std::cout << it.get() << " ";
+//        it.prev();
+//    }
+//    std::cout << it.get() << "\n";
+//
+//    it.set(50);
+//    std::cout << it.get() << "\n";
+//    std::cout << it.hasPrev() << "\n";
+//
+//    std::cout << list.head() << " " << list.tail() << "\n";
+//    std::cout << list.size() << "\n";
+
+
 
 
 }

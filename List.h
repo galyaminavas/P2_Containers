@@ -93,11 +93,99 @@ public:
             currentChunk_->data_[currentIndexInChunk_] = value;
         }
 
-        void insert(const T& value);
+        void insert(const T& value) {
+            if (currentChunk_->elements_ < chunkSize_) { // в текущем чанке хватает места
+                for (int i = currentChunk_->elements_; i > currentIndexInChunk_; i--) {
+                    currentChunk_->data_[i] = std::move(currentChunk_->data_[i - 1]);
+                }
+                currentChunk_->data_[currentIndexInChunk_] = value;
+                currentChunk_->elements_++;
+                list_.size_++;
+            } else {
+                // в текущем чанке места не хватает и следующего чанка нет
+                if (currentChunk_->next == nullptr) {
+                    Chunk<T>* newChunk_ = new Chunk<T>();
+                    newChunk_->insertHead(currentChunk_->data_[chunkSize_ - 1]);
+                    newChunk_->prev = currentChunk_;
+                    for (int i = chunkSize_ - 1; i > currentIndexInChunk_; i--) {
+                        currentChunk_->data_[i] = std::move(currentChunk_->data_[i - 1]);
+                    }
+                    currentChunk_->data_[currentIndexInChunk_] = value;
+                    currentChunk_->next = newChunk_;
+                    list_.size_++;
+                    list_.tail_ = newChunk_;
+                } else { // следующий чанк есть
+                    Chunk<T>* nextChunk_ = currentChunk_->next;
+                    if (nextChunk_->elements_ < chunkSize_) { // в следующем чанке есть свободное место
+                        nextChunk_->insertHead(currentChunk_->data_[chunkSize_ - 1]);
+                        for (int i = chunkSize_ - 1; i > currentIndexInChunk_; i--) {
+                            currentChunk_->data_[i] = std::move(currentChunk_->data_[i - 1]);
+                        }
+                        currentChunk_->data_[currentIndexInChunk_] = value;
+                        list_.size_++;
+                    } else { // в следующем чанке нет свободного места - создаём новый
+                        Chunk<T>* newChunk_ = new Chunk<T>();
+                        Chunk<T>* oldNext_ = currentChunk_->next;
+                        newChunk_->insertHead(currentChunk_->data_[chunkSize_ - 1]);
+                        newChunk_->prev = currentChunk_;
+                        newChunk_->next = oldNext_;
+                        for (int i = chunkSize_ - 1; i > currentIndexInChunk_; i--) {
+                            currentChunk_->data_[i] = std::move(currentChunk_->data_[i - 1]);
+                        }
+                        currentChunk_->data_[currentIndexInChunk_] = value;
+                        oldNext_->prev = newChunk_;
+                        currentChunk_->next = newChunk_;
+                        list_.size_++;
+                    }
+                }
+            }
+        }
 
-
-        void remove();
-
+        void remove() {
+            if (currentChunk_->elements_ == 0) {
+                return;
+            } else if (currentChunk_->elements_ == 1) {
+                if (currentChunk_->next != nullptr) { // есть следующий чанк
+                    Chunk<T>* nextChunk_ = currentChunk_->next;
+                    if (currentChunk_->prev != nullptr) { // есть предыдущий чанк
+                        Chunk<T>* prevChunk_ = currentChunk_->prev;
+                        prevChunk_->next = nextChunk_;
+                        nextChunk_->prev = prevChunk_;
+                        delete currentChunk_;
+                        // в текущем чанке текущий индекс был 0, он и остаётся в новом
+                        list_.size_--;
+                        currentChunk_ = nextChunk_;
+                    } else { // нет предыдущего - значит, была голова
+                        nextChunk_->prev = nullptr;
+                        list_.head_ = nextChunk_;
+                        delete currentChunk_;
+                        currentChunk_ = nextChunk_;
+                        list_.size_--;
+                    }
+                } else { // следующего чанка нет, значит - хвост
+                    if (currentChunk_->prev != nullptr) { // предыдущий чанк есть
+                        Chunk<T>* prevChunk_ = currentChunk_->prev;
+                        prevChunk_->next = nullptr;
+                        list_.tail_ = prevChunk_;
+                        delete currentChunk_;
+                        currentChunk_ = prevChunk_;
+                        // переходим на последний индекс предыдущего чанка?
+                        currentIndexInChunk_ = currentChunk_->elements_ - 1;
+                        currentIndexInList_--;
+                        list_.size_--;
+                    } else { // предыдущего нет, остаётся пустой список
+                        currentChunk_->removeHead();
+                        list_.size_--;
+                    }
+                }
+            } else { // можем спокойно удалить один элемент из чанка
+                for (int i = currentIndexInChunk_; i < currentChunk_->elements_; i++) {
+                    currentChunk_->data_[i] = std::move(currentChunk_->data_[i + 1]);
+                }
+                currentChunk_->removeTail();
+                list_.size_--;
+            }
+        }
 
         void next() {
             if (currentIndexInChunk_ < currentChunk_->elements_ - 1) {
