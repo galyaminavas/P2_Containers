@@ -6,6 +6,7 @@
 
 template<typename T>
 class Array final {
+    void *rawMem;
     T* data_;
     int elementsCount_ = 0;
     const int initCapacity_ = 16;
@@ -77,22 +78,37 @@ public:
     int currCapacity;
 
     Array() {
-        data_ = (T *)malloc(initCapacity_ * sizeof(T));
+        rawMem = malloc(initCapacity_ * sizeof(T));
+        data_ = (T *) rawMem;
+//        data_ = new(rawMem) T[initCapacity_];
+//        for (int i = 0; i < initCapacity_; i++) {
+//            new(data_ + i) T;
+//        }
+
+
+//        data_ = (T *)malloc(initCapacity_ * sizeof(T));
 //        data_ = new T[initCapacity_];
         currCapacity = initCapacity_;
 
         //Debug output
-        std::cout << "Array() " << currCapacity << std::endl;
+//        std::cout << "Array() " << currCapacity << std::endl;
         //\Debug output
     }
 
     Array(int capacity) {
-        data_ = (T *)malloc(capacity * sizeof(T));
+        rawMem = malloc(capacity * sizeof(T));
+        data_ = (T *) rawMem;
+//        for (int i = 0; i < capacity; i++) {
+//            new(data_ + i) T;
+//        }
+
+
+//        data_ = (T *)malloc(capacity * sizeof(T));
 //        data_ = new T[capacity];
         currCapacity = capacity;
 
         //Debug output
-        std::cout << "Array(" << currCapacity << ")\n";
+//        std::cout << "Array(" << currCapacity << ")\n";
         //\Debug output
     }
 
@@ -102,76 +118,88 @@ public:
         for (int i = 0; i < elementsCount_; i++) {
             data_[i].~T();
         }
-        free(data_);
+        free(rawMem);
+//        free(data_);
+
 //        delete [] data_;
 
         //Debug output
-        std::cout << "~Array\n";
-//        for (int i = 0; i < elementsCount_; i++) {
-//            std::cout << data_[i] << " ";
-//        }
-//        std::cout << "\n";
+//        std::cout << "~Array\n";
         //\Debug output
     }
 
     void insert(const T& value) {
         if (currCapacity <= elementsCount_) {
             currCapacity *= 2;
-            T* newArrayStart = (T *)malloc(currCapacity * sizeof(T));
+            void *newRawMem = malloc(currCapacity * sizeof(T));
+            T* newArrayStart = (T*) newRawMem;
+//            T* newArrayStart = (T *)malloc(currCapacity * sizeof(T));
+
 //            T* newArrayStart = new T[currCapacity];
-            for (int i = 0; i < elementsCount_; i++) {
+            for (int i = 0; i < elementsCount_; i++) {\
+                new(newArrayStart + i) T;
                 newArrayStart[i] = std::move(data_[i]);
             }
 //            newArrayStart = std::move(data_); // will not change the address - incorrect!
             //Debug output
-            for (int i = 0; i < elementsCount_; i++) {
-                std::cout << &data_[i] << " -> " << &newArrayStart[i] << std::endl;
-            }
+//            for (int i = 0; i < elementsCount_; i++) {
+//                std::cout << &data_[i] << " -> " << &newArrayStart[i] << std::endl;
+//            }
             //\Debug output
-//            std::cout << data_[0] << std::endl;
-//            std::cout << newArrayStart[0] << std::endl;
 
-            free(data_);
+            free(rawMem);
+//            free(data_);
+
 //            delete [] data_;
 
-//            std::cout << *data_ << std::endl;
-//            std::cout << newArrayStart[0] << std::endl;
             data_ = newArrayStart;
+            rawMem = newRawMem;
         }
+        new(data_ + elementsCount_) T;
         data_[elementsCount_] = value;
         elementsCount_++;
-        std::cout << "Capacity: " << currCapacity << ", Elements: " << elementsCount_ << std::endl;
-        for (int i = 0; i < elementsCount_; i++) {
-            std::cout << data_[i] << " ";
-        }
-        std::cout << std::endl;
+
+        //Debug output
+//        std::cout << "Capacity: " << currCapacity << ", Elements: " << elementsCount_ << std::endl;
+//        for (int i = 0; i < elementsCount_; i++) {
+//            std::cout << data_[i] << " ";
+//        }
+//        std::cout << std::endl;
+        //\Debug output
     }
 
     void insert(int index, const T& value) {
         if (currCapacity <= elementsCount_) {
             currCapacity *= 2;
-            T* newArrayStart = (T *)malloc(currCapacity * sizeof(T));
+            void *newRawMem = malloc(currCapacity * sizeof(T));
+            T* newArrayStart = (T*) newRawMem;
+//            T* newArrayStart = (T *)malloc(currCapacity * sizeof(T));
 //            T* newArrayStart = new T[currCapacity];
             for (int i = 0; i < index; i++) {
+                new(newArrayStart + i) T;
                 newArrayStart[i] = std::move(data_[i]);
             }
+            new(newArrayStart + index) T;
             newArrayStart[index] = value;
             for (int i = index; i < elementsCount_; i++) {
+                new(newArrayStart + i + 1) T;
                 newArrayStart[i + 1] = std::move(data_[i]);
             }
             elementsCount_++;
 
             //Debug output
-            for (int i = 0; i < elementsCount_; i++) {
-                std::cout << &data_[i] << " -> " << &newArrayStart[i] << std::endl;
-            }
+//            for (int i = 0; i < elementsCount_; i++) {
+//                std::cout << &data_[i] << " -> " << &newArrayStart[i] << std::endl;
+//            }
             //\Debug output
+            free(rawMem);
+//            free(data_);
 
-            free(data_);
 //            delete [] data_;
             data_ = newArrayStart;
-//            std::swap(newArrayStart, data_);
+            rawMem = newRawMem;
         } else {
+            new (data_ + elementsCount_) T;
             for (int i = elementsCount_; i > index; i--) {
                 data_[i] = std::move(data_[i - 1]);
             }
@@ -180,11 +208,11 @@ public:
         }
 
         //Debug output
-        std::cout << "Capacity: " << currCapacity << ", Elements: " << elementsCount_ << std::endl;
-        for (int i = 0; i < elementsCount_; i++) {
-            std::cout << data_[i] << " ";
-        }
-        std::cout << std::endl;
+//        std::cout << "Capacity: " << currCapacity << ", Elements: " << elementsCount_ << std::endl;
+//        for (int i = 0; i < elementsCount_; i++) {
+//            std::cout << data_[i] << " ";
+//        }
+//        std::cout << std::endl;
         //\Debug output
     }
 
@@ -196,11 +224,11 @@ public:
         elementsCount_--;
 
         //Debug output
-        std::cout << "Capacity: " << currCapacity << ", Elements: " << elementsCount_ << std::endl;
-        for (int i = 0; i < elementsCount_; i++) {
-            std::cout << data_[i] << " ";
-        }
-        std::cout << std::endl;
+//        std::cout << "Capacity: " << currCapacity << ", Elements: " << elementsCount_ << std::endl;
+//        for (int i = 0; i < elementsCount_; i++) {
+//            std::cout << data_[i] << " ";
+//        }
+//        std::cout << std::endl;
         //\Debug output
     }
 
