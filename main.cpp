@@ -170,6 +170,5 @@ void workingWithList() {
 }
 
 int main() {
-    workingWithList();
     return 0;
 }

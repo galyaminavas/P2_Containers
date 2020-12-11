@@ -205,3 +205,92 @@ TEST(testArray, iterator) {
     it.next();
     ASSERT_EQ(it.get(), 2);
 }
+
+// Test that insert operation works correctly for elements with constructor
+TEST(testArray, insertForString) {
+    Array<std::string> array(1);
+    ASSERT_EQ(array.size(), 0);
+    ASSERT_EQ(array.currCapacity, 1);
+
+    array.insert("one");
+    ASSERT_EQ(array.size(), 1);
+    ASSERT_EQ(array.currCapacity, 1);
+
+    array.insert("two");
+    ASSERT_EQ(array.size(), 2);
+    ASSERT_EQ(array.currCapacity, 2);
+
+    array.insert("three");
+    ASSERT_EQ(array.size(), 3);
+    ASSERT_EQ(array.currCapacity, 4);
+
+    ASSERT_EQ(array[0], "one");
+    ASSERT_EQ(array[1], "two");
+    ASSERT_EQ(array[2], "three");
+}
+
+TEST(testArray, insertForClass) {
+    class MyClass {
+    public:
+        int number;
+        std::string text;
+
+        MyClass() {
+            number = 0;
+            text = "zero";
+        }
+
+        MyClass(int key_, std::string value_) {
+            number = key_;
+            text = value_;
+        }
+    };
+
+    MyClass arrayToCheck[4];
+    arrayToCheck[0] = MyClass(1, "one");
+    arrayToCheck[1] = MyClass(2, "two");
+    arrayToCheck[2] = MyClass(3, "three");
+
+    Array<MyClass> array(1);
+    ASSERT_EQ(array.size(), 0);
+    ASSERT_EQ(array.currCapacity, 1);
+
+    array.insert(MyClass(1, "one"));
+    ASSERT_EQ(array.size(), 1);
+    ASSERT_EQ(array.currCapacity, 1);
+
+    array.insert(MyClass(2, "two"));
+    ASSERT_EQ(array.size(), 2);
+    ASSERT_EQ(array.currCapacity, 2);
+
+    array.insert(MyClass(3, "three"));
+    ASSERT_EQ(array.size(), 3);
+    ASSERT_EQ(array.currCapacity, 4);
+
+    for (int i = 0; i < array.size(); i++) {
+        ASSERT_EQ(array[i].number, arrayToCheck[i].number);
+        ASSERT_EQ(array[i].text, arrayToCheck[i].text);
+    }
+}
+
+TEST(testArray, insertIndexForString) {
+    Array<std::string> array(1);
+    ASSERT_EQ(array.size(), 0);
+    ASSERT_EQ(array.currCapacity, 1);
+
+    array.insert(0, "one");
+    ASSERT_EQ(array.size(), 1);
+    ASSERT_EQ(array.currCapacity, 1);
+
+    array.insert(0, "two");
+    ASSERT_EQ(array.size(), 2);
+    ASSERT_EQ(array.currCapacity, 2);
+
+    array.insert(0, "three");
+    ASSERT_EQ(array.size(), 3);
+    ASSERT_EQ(array.currCapacity, 4);
+
+    ASSERT_EQ(array[0], "three");
+    ASSERT_EQ(array[1], "two");
+    ASSERT_EQ(array[2], "one");
+}

@@ -28,6 +28,99 @@ TEST(testList, insertTail) {
     ASSERT_EQ(list.tail(), 16);
 }
 
+// Test insert for elements with constructor
+TEST(testList, insertHeadString) {
+    List<std::string> list;
+    for (int i = 0; i < 15; i++) {
+        list.insertHead("one");
+    }
+    list.insertHead("two");
+    ASSERT_EQ(list.size(), 16);
+    ASSERT_EQ(list.head(), "two");
+    ASSERT_EQ(list.tail(), "one");
+}
+
+TEST(testList, insertHeadClass) {
+    class MyClass {
+    public:
+        int number;
+        std::string text;
+
+        MyClass() {
+            number = 0;
+            text = "zero";
+        }
+
+        MyClass(int key_, std::string value_) {
+            number = key_;
+            text = value_;
+        }
+    };
+
+    List<MyClass> list;
+    MyClass arrayToCheck[16];
+
+    for (int i = 0; i < 15; i++) {
+        arrayToCheck[i] = MyClass(i, "first");
+        list.insertHead(MyClass(i, "first"));
+    }
+    arrayToCheck[15] = MyClass(15, "second");
+    list.insertHead(MyClass(15, "second"));
+    ASSERT_EQ(list.size(), 16);
+    ASSERT_EQ(list.head().number, arrayToCheck[15].number);
+    ASSERT_EQ(list.head().text, arrayToCheck[15].text);
+    ASSERT_EQ(list.tail().number, arrayToCheck[0].number);
+    ASSERT_EQ(list.tail().text, arrayToCheck[0].text);
+
+    std::cout << "\n";
+}
+
+TEST(testList, insertTailString) {
+    List<std::string> list;
+    for (int i = 0; i < 15; i++) {
+        list.insertTail("one");
+    }
+    list.insertTail("two");
+    ASSERT_EQ(list.size(), 16);
+    ASSERT_EQ(list.head(), "one");
+    ASSERT_EQ(list.tail(), "two");
+}
+
+TEST(testList, insertTailClass) {
+    class MyClass {
+    public:
+        int number;
+        std::string text;
+
+        MyClass() {
+            number = 0;
+            text = "zero";
+        }
+
+        MyClass(int key_, std::string value_) {
+            number = key_;
+            text = value_;
+        }
+    };
+
+    List<MyClass> list;
+    MyClass arrayToCheck[16];
+
+    for (int i = 0; i < 15; i++) {
+        arrayToCheck[i] = MyClass(i, "first");
+        list.insertTail(MyClass(i, "first"));
+    }
+    arrayToCheck[15] = MyClass(15, "second");
+    list.insertTail(MyClass(15, "second"));
+    ASSERT_EQ(list.size(), 16);
+    ASSERT_EQ(list.head().number, arrayToCheck[0].number);
+    ASSERT_EQ(list.head().text, arrayToCheck[0].text);
+    ASSERT_EQ(list.tail().number, arrayToCheck[15].number);
+    ASSERT_EQ(list.tail().text, arrayToCheck[15].text);
+
+    std::cout << "\n";
+}
+
 // Test head & removeHead
 TEST(testList, removeHead) {
     List<int> list;
@@ -102,7 +195,7 @@ TEST(testList, iteratorSet) {
     // list after set operations:
     // 2 3 4 5 6
 
-    list.stupidPrint();
+//    list.stupidPrint();
 }
 
 TEST(testList, iteratorInsert1) {
@@ -122,7 +215,27 @@ TEST(testList, iteratorInsert1) {
     // list after insert operation:
     // 100 1 2 3 4 5
 
-    list.stupidPrint();
+//    list.stupidPrint();
+}
+
+TEST(testList, iteratorInsertString1) {
+    // insert in chunk with enough space
+    List<std::string> list;
+    for (int i = 0; i < 5; i++) {
+        list.insertTail(std::to_string(i + 1));
+    }
+    // list of one chunk:
+    // 1 2 3 4 5
+
+    ASSERT_EQ(list.size(), 5);
+    auto it = list.iterator();
+    it.insert(std::to_string(100));
+    ASSERT_EQ(list.size(), 6);
+    ASSERT_EQ(it.get(), "100");
+    // list after insert operation:
+    // 100 1 2 3 4 5
+
+//    list.stupidPrint();
 }
 
 TEST(testList, iteratorInsert2) {
@@ -143,7 +256,28 @@ TEST(testList, iteratorInsert2) {
     // 100 1 2 3 4 5 6 7 8 9 10 11 12 13 14
     // 15
 
-    list.stupidPrint();
+//    list.stupidPrint();
+}
+
+TEST(testList, iteratorInsertString2) {
+    // not enough space in chunk, no next chunk, the new chunk is created
+    List<std::string> list;
+    for (int i = 0; i < 15; i++) {
+        list.insertTail(std::to_string(i + 1));
+    }
+    // list of one chunk:
+    // 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+
+    ASSERT_EQ(list.size(), 15);
+    auto it = list.iterator();
+    it.insert(std::to_string(100));
+    ASSERT_EQ(list.size(), 16);
+    ASSERT_EQ(it.get(), "100");
+    // list after insert operation:
+    // 100 1 2 3 4 5 6 7 8 9 10 11 12 13 14
+    // 15
+
+//    list.stupidPrint();
 }
 
 TEST(testList, iteratorInsert3) {
@@ -165,7 +299,29 @@ TEST(testList, iteratorInsert3) {
     // 100 1 2 3 4 5 6 7 8 9 10 11 12 13 14
     // 15 16
 
-    list.stupidPrint();
+//    list.stupidPrint();
+}
+
+TEST(testList, iteratorInsertString3) {
+    // not enough space in chunk, the next chunk exists and has enough space
+    List<std::string> list;
+    for (int i = 0; i < 16; i++) {
+        list.insertTail(std::to_string(i + 1));
+    }
+    // list of two chunks:
+    // 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+    // 16
+
+    ASSERT_EQ(list.size(), 16);
+    auto it = list.iterator();
+    it.insert("100");
+    ASSERT_EQ(list.size(), 17);
+    ASSERT_EQ(it.get(), "100");
+    // list after insert operation:
+    // 100 1 2 3 4 5 6 7 8 9 10 11 12 13 14
+    // 15 16
+
+//    list.stupidPrint();
 }
 
 TEST(testList, iteratorInsert4) {
@@ -188,7 +344,30 @@ TEST(testList, iteratorInsert4) {
     // 15
     // 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
 
-    list.stupidPrint();
+//    list.stupidPrint();
+}
+
+TEST(testList, iteratorInsertString4) {
+    // not enough space in chunk, the next chunk does not have enough space, the new one created
+    List<std::string> list;
+    for (int i = 0; i < 30; i++) {
+        list.insertTail(std::to_string(i + 1));
+    }
+    // list of two chunks:
+    // 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+    // 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
+
+    ASSERT_EQ(list.size(), 30);
+    auto it = list.iterator();
+    it.insert("100");
+    ASSERT_EQ(list.size(), 31);
+    ASSERT_EQ(it.get(), "100");
+    // list after insert operation:
+    // 100 1 2 3 4 5 6 7 8 9 10 11 12 13 14
+    // 15
+    // 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
+
+//    list.stupidPrint();
 }
 
 TEST(testList, iteratorRemove1) {
@@ -217,7 +396,7 @@ TEST(testList, iteratorRemove1) {
     // 1 2 3 4 5 6 7 8 9 10 11 12 13 14 100
     // 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
 
-    list.stupidPrint();
+//    list.stupidPrint();
 }
 
 TEST(testList, iteratorRemove2) {
@@ -239,7 +418,7 @@ TEST(testList, iteratorRemove2) {
     // list after remove:
     // 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1
 
-    list.stupidPrint();
+//    list.stupidPrint();
 }
 
 TEST(testList, iteratorRemove3) {
@@ -264,7 +443,7 @@ TEST(testList, iteratorRemove3) {
     // list after remove:
     // 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 
-    list.stupidPrint();
+//    list.stupidPrint();
 }
 
 TEST(testList, iteratorRemove4) {
@@ -318,7 +497,7 @@ TEST(testList, iteratorRemove5) {
     // list after remove:
     // 2 4
 
-    list.stupidPrint();
+//    list.stupidPrint();
 }
 
 // Test next & hasNext
@@ -366,5 +545,5 @@ TEST(testList, iteratorPrev) {
     ASSERT_EQ(it.get(), 1);
     ASSERT_FALSE(it.hasPrev());
 
-    list.stupidPrint();
+//    list.stupidPrint();
 }
