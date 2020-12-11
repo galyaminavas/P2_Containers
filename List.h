@@ -5,14 +5,14 @@
 
 // chunk 15 elements to fit in
 // the cache line of 64 bytes for T==int
-#define chunkSize_ 15
+#define CHUNK_SIZE 15
 
 template<typename T>
 struct Chunk {
 public:
     int elements_ = 0;
-    T data_[chunkSize_];
-//    T* data_ = new T[chunkSize_];
+    T data_[CHUNK_SIZE];
+//    T* data_ = new T[CHUNK_SIZE];
 //    T* data_ = (T*)malloc(14 * sizeof(T));
     Chunk<T>* next = nullptr;
     Chunk<T>* prev = nullptr;
@@ -31,10 +31,11 @@ public:
     }
 
     void removeHead() {
-        data_[0].~T();
+//        data_[0].~T();
         for (int i = 0; i < elements_ - 1; i++) {
             data_[i] = std::move(data_[i + 1]);
         }
+        data_[elements_ - 1].~T();
         elements_--;
     }
 
@@ -44,7 +45,7 @@ public:
     }
 
     Chunk() {
-        std::cout << "Chunk()\n";
+//        std::cout << "Chunk()\n";
     }
 
     ~Chunk() {
@@ -54,9 +55,7 @@ public:
             data_[i].~T();
 //            std::cout << "~elem\n";
         }
-//        delete [] data_;
-//        free(data_);
-        std::cout << "~Chunk\n";
+//        std::cout << "~Chunk\n";
     }
 
     void printChunk() {
@@ -94,7 +93,7 @@ public:
         }
 
         void insert(const T& value) {
-            if (currentChunk_->elements_ < chunkSize_) { // в текущем чанке хватает места
+            if (currentChunk_->elements_ < CHUNK_SIZE) { // в текущем чанке хватает места
                 for (int i = currentChunk_->elements_; i > currentIndexInChunk_; i--) {
                     currentChunk_->data_[i] = std::move(currentChunk_->data_[i - 1]);
                 }
@@ -105,9 +104,9 @@ public:
                 // в текущем чанке места не хватает и следующего чанка нет
                 if (currentChunk_->next == nullptr) {
                     Chunk<T>* newChunk_ = new Chunk<T>();
-                    newChunk_->insertHead(currentChunk_->data_[chunkSize_ - 1]);
+                    newChunk_->insertHead(currentChunk_->data_[CHUNK_SIZE - 1]);
                     newChunk_->prev = currentChunk_;
-                    for (int i = chunkSize_ - 1; i > currentIndexInChunk_; i--) {
+                    for (int i = CHUNK_SIZE - 1; i > currentIndexInChunk_; i--) {
                         currentChunk_->data_[i] = std::move(currentChunk_->data_[i - 1]);
                     }
                     currentChunk_->data_[currentIndexInChunk_] = value;
@@ -116,9 +115,9 @@ public:
                     list_.tail_ = newChunk_;
                 } else { // следующий чанк есть
                     Chunk<T>* nextChunk_ = currentChunk_->next;
-                    if (nextChunk_->elements_ < chunkSize_) { // в следующем чанке есть свободное место
-                        nextChunk_->insertHead(currentChunk_->data_[chunkSize_ - 1]);
-                        for (int i = chunkSize_ - 1; i > currentIndexInChunk_; i--) {
+                    if (nextChunk_->elements_ < CHUNK_SIZE) { // в следующем чанке есть свободное место
+                        nextChunk_->insertHead(currentChunk_->data_[CHUNK_SIZE - 1]);
+                        for (int i = CHUNK_SIZE - 1; i > currentIndexInChunk_; i--) {
                             currentChunk_->data_[i] = std::move(currentChunk_->data_[i - 1]);
                         }
                         currentChunk_->data_[currentIndexInChunk_] = value;
@@ -126,10 +125,10 @@ public:
                     } else { // в следующем чанке нет свободного места - создаём новый
                         Chunk<T>* newChunk_ = new Chunk<T>();
                         Chunk<T>* oldNext_ = currentChunk_->next;
-                        newChunk_->insertHead(currentChunk_->data_[chunkSize_ - 1]);
+                        newChunk_->insertHead(currentChunk_->data_[CHUNK_SIZE - 1]);
                         newChunk_->prev = currentChunk_;
                         newChunk_->next = oldNext_;
-                        for (int i = chunkSize_ - 1; i > currentIndexInChunk_; i--) {
+                        for (int i = CHUNK_SIZE - 1; i > currentIndexInChunk_; i--) {
                             currentChunk_->data_[i] = std::move(currentChunk_->data_[i - 1]);
                         }
                         currentChunk_->data_[currentIndexInChunk_] = value;
@@ -222,10 +221,10 @@ public:
     };
 
     List() {
-        std::cout << "List() enter\n";
+//        std::cout << "List() enter\n";
         head_ = new Chunk<T>();
         tail_ = head_;
-        std::cout << "List() exit\n";
+//        std::cout << "List() exit\n";
     }
 
     ~List() {
@@ -233,17 +232,14 @@ public:
         Chunk<T>* nextChunk;
         while (currChunk != nullptr) {
             nextChunk = currChunk->next;
-            //При необходимости, при освобождении памяти
-            //вызываются деструкторы хранимых элементов.
-//            currChunk->~Chunk();
             delete currChunk;
             currChunk = nextChunk;
         }
-        std::cout << "~List\n";
+//        std::cout << "~List\n";
     }
 
     void insertHead(const T& value) {
-        if (head_->elements_ < chunkSize_) {
+        if (head_->elements_ < CHUNK_SIZE) {
             head_->insertHead(value);
         } else {
             Chunk<T>* newHead_ = new Chunk<T>();
@@ -256,7 +252,7 @@ public:
     }
 
     void insertTail(const T& value) {
-        if (tail_->elements_ < chunkSize_) {
+        if (tail_->elements_ < CHUNK_SIZE) {
             tail_->insertTail(value);
         } else {
             Chunk<T>* newTail_ = new Chunk<T>();
